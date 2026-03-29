@@ -466,9 +466,9 @@
       item.innerHTML = `
         <div>
           <span class="skill-name">${s.name}</span>
-          <span class="skill-agent"> &mdash; ${s.agent}</span>
+          <span class="skill-agent"> &mdash; ${s.description || ""}</span>
         </div>
-        <span class="skill-status ${s.enabled ? "enabled" : "disabled"}">${s.enabled ? "activo" : "inactivo"}</span>
+        <span class="skill-status enabled">activo</span>
       `;
       dom.skillsList.appendChild(item);
     });
@@ -546,25 +546,32 @@
 
   async function loadRealData() {
     try {
-      const [stats, audit, skills] = await Promise.all([
-        apiFetch("/api/stats"),
-        apiFetch("/api/audit?limit=50"),
-        apiFetch("/api/skills"),
+      const data = await Promise.all([
+        apiFetch("/audit?limit=50"),
+        apiFetch("/skills"),
       ]);
 
-      if (stats) {
-        dom.statTotal.textContent  = stats.total ?? "--";
-        dom.statOk.textContent     = stats.ok ?? "--";
-        dom.statErrors.textContent = stats.errors ?? "--";
-        dom.statAlerts.textContent = stats.alerts ?? "--";
+      // Stats from audit data
+      const audit = data[0];
+      const skills = data[1];
+
+      if (audit && audit.entries) {
+        const entries = audit.entries;
+        const ok = entries.filter(e => e.status === "ok" || e.status === "confirmed").length;
+        const errors = entries.filter(e => e.status === "error").length;
+        dom.statTotal.textContent  = entries.length;
+        dom.statOk.textContent     = ok;
+        dom.statErrors.textContent = errors;
+        dom.statAlerts.textContent = entries.filter(e => e.status === "blocked").length;
+
+        entries.slice(0, 20).forEach((r) => {
+          const time = r.created_at ? new Date(r.created_at).toLocaleTimeString("es-ES", {hour:"2-digit",minute:"2-digit",second:"2-digit"}) : "--";
+          addAuditRow(time, r.agent_name + "." + r.action, r.status, r.error_message || r.user_id || "");
+        });
       }
 
-      if (audit && Array.isArray(audit)) {
-        audit.forEach((r) => addAuditRow(r.timestamp, r.skill, r.status, r.detail));
-      }
-
-      if (skills && Array.isArray(skills)) {
-        renderSkills(skills);
+      if (skills && skills.skills && Array.isArray(skills.skills)) {
+        renderSkills(skills.skills);
       }
 
       dom.statusDot.className = "status-dot";
@@ -630,12 +637,13 @@
     if (WS && WS.readyState === WebSocket.OPEN) {
       WS.send(JSON.stringify({ type: "chat", text }));
     } else {
-      apiFetch("/api/chat", {
+      apiFetch("/message", {
         method: "POST",
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ text, session_id: "dashboard_" + Date.now(), channel: "dashboard" }),
       })
         .then((data) => {
-          if (data?.reply) addChatMessage(data.reply, "bot");
+          if (data?.response) addChatMessage(data.response, "bot");
+          else if (data?.text) addChatMessage(data.text, "bot");
         })
         .catch(() => addChatMessage("Error al enviar mensaje.", "bot"));
     }
