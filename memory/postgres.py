@@ -50,11 +50,12 @@ async def close_pool() -> None:
 
 async def save_message(session_id: str, role: str, content: str, channel: str = "api", metadata: dict | None = None) -> None:
     """Guarda un mensaje en el historial de conversaciones."""
+    import json as _json
     pool = _get_pool()
     await pool.execute(
-        "INSERT INTO conversation_history (session_id, role, content, channel, metadata) "
-        "VALUES ($1, $2, $3, $4, $5)",
-        session_id, role, content, channel, metadata,
+        "INSERT INTO agent_conversations (session_id, role, content, channel, metadata) "
+        "VALUES ($1, $2, $3, $4, $5::jsonb)",
+        session_id, role, content, channel, _json.dumps(metadata or {}),
     )
 
 
@@ -62,7 +63,7 @@ async def get_history(session_id: str, limit: int = 20) -> list[dict]:
     """Devuelve los últimos mensajes de una sesión."""
     pool = _get_pool()
     rows = await pool.fetch(
-        "SELECT role, content, channel, created_at FROM conversation_history "
+        "SELECT role, content, channel, created_at FROM agent_conversations "
         "WHERE session_id = $1 ORDER BY created_at DESC LIMIT $2",
         session_id, limit,
     )
@@ -89,7 +90,7 @@ async def log_audit(
     """Registra una acción en la tabla de auditoría."""
     pool = _get_pool()
     await pool.execute(
-        "INSERT INTO agent_audit (agent_name, action, status, detail, session_id) "
+        "INSERT INTO agent_audit_log (agent_name, action, status, error_message, user_id) "
         "VALUES ($1, $2, $3, $4, $5)",
         agent_name, action, status, detail, session_id,
     )
@@ -116,7 +117,7 @@ async def get_audit(
     where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
     params.append(limit)
     rows = await pool.fetch(
-        f"SELECT * FROM agent_audit {where} ORDER BY created_at DESC LIMIT ${idx}",
+        f"SELECT * FROM agent_audit_log {where} ORDER BY created_at DESC LIMIT ${idx}",
         *params,
     )
     return [dict(r) for r in rows]
