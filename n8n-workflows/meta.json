@@ -1,0 +1,225 @@
+{
+  "name": "PiBot — Meta (Facebook + Instagram)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "meta/publish_facebook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-publish-fb",
+      "name": "Webhook — Publish Facebook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "meta-publish-facebook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "meta/publish_instagram",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-publish-ig",
+      "name": "Webhook — Publish Instagram",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 520],
+      "webhookId": "meta-publish-instagram"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "meta/get_page_posts",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get-posts",
+      "name": "Webhook — Get Page Posts",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 740],
+      "webhookId": "meta-get-page-posts"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "meta/get_ig_media",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get-ig-media",
+      "name": "Webhook — Get IG Media",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 960],
+      "webhookId": "meta-get-ig-media"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v19.0/{{ $json.body.pageId }}/feed",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "message", "value": "={{ $json.body.message }}" },
+            { "name": "access_token", "value": "={{ $json.body.accessToken }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-publish-fb",
+      "name": "HTTP — Publish to Facebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v19.0/{{ $json.body.igUserId }}/media",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "caption", "value": "={{ $json.body.caption }}" },
+            { "name": "image_url", "value": "={{ $json.body.imageUrl }}" },
+            { "name": "access_token", "value": "={{ $json.body.accessToken }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-publish-ig",
+      "name": "HTTP — Publish to Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 520]
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v19.0/{{ $json.body.pageId }}/posts",
+        "method": "GET",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "access_token", "value": "={{ $json.body.accessToken }}" },
+            { "name": "limit", "value": "={{ $json.body.limit || 10 }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-get-posts",
+      "name": "HTTP — Get Page Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 740]
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v19.0/{{ $json.body.igUserId }}/media",
+        "method": "GET",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "access_token", "value": "={{ $json.body.accessToken }}" },
+            { "name": "limit", "value": "={{ $json.body.limit || 10 }}" },
+            { "name": "fields", "value": "id,caption,media_type,media_url,timestamp,permalink" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-get-ig-media",
+      "name": "HTTP — Get IG Media",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 960]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-fb",
+      "name": "Respond — Facebook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-ig",
+      "name": "Respond — Instagram",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 520]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-posts",
+      "name": "Respond — Posts",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 740]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-ig-media",
+      "name": "Respond — IG Media",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 960]
+    }
+  ],
+  "connections": {
+    "Webhook — Publish Facebook": {
+      "main": [[{ "node": "HTTP — Publish to Facebook", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Publish Instagram": {
+      "main": [[{ "node": "HTTP — Publish to Instagram", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Get Page Posts": {
+      "main": [[{ "node": "HTTP — Get Page Posts", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Get IG Media": {
+      "main": [[{ "node": "HTTP — Get IG Media", "type": "main", "index": 0 }]]
+    },
+    "HTTP — Publish to Facebook": {
+      "main": [[{ "node": "Respond — Facebook", "type": "main", "index": 0 }]]
+    },
+    "HTTP — Publish to Instagram": {
+      "main": [[{ "node": "Respond — Instagram", "type": "main", "index": 0 }]]
+    },
+    "HTTP — Get Page Posts": {
+      "main": [[{ "node": "Respond — Posts", "type": "main", "index": 0 }]]
+    },
+    "HTTP — Get IG Media": {
+      "main": [[{ "node": "Respond — IG Media", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "pibot"
+    }
+  ],
+  "triggerCount": 4,
+  "updatedAt": "2026-03-29T00:00:00.000Z",
+  "versionId": "1"
+}

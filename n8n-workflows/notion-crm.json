@@ -1,0 +1,342 @@
+{
+  "name": "PiBot — Notion CRM",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notion/crm/create_contact",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-create-contact",
+      "name": "Webhook — Create Contact",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "notion-crm-create-contact"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notion/crm/get_contacts",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get-contacts",
+      "name": "Webhook — Get Contacts",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 520],
+      "webhookId": "notion-crm-get-contacts"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notion/crm/create_deal",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-create-deal",
+      "name": "Webhook — Create Deal",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 740],
+      "webhookId": "notion-crm-create-deal"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notion/crm/get_deals",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get-deals",
+      "name": "Webhook — Get Deals",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 960],
+      "webhookId": "notion-crm-get-deals"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notion/crm/update_deal",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-update-deal",
+      "name": "Webhook — Update Deal",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 1180],
+      "webhookId": "notion-crm-update-deal"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "create",
+        "databaseId": "={{ $json.body.contactsDatabaseId }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Name",
+              "title": "={{ $json.body.name }}"
+            },
+            {
+              "key": "Email",
+              "emailValue": "={{ $json.body.email }}"
+            },
+            {
+              "key": "Phone",
+              "phoneValue": "={{ $json.body.phone }}"
+            },
+            {
+              "key": "Company",
+              "richTextValue": "={{ $json.body.company }}"
+            },
+            {
+              "key": "Status",
+              "selectValue": "={{ $json.body.status || 'Lead' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notion-create-contact",
+      "name": "Notion — Create Contact",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [500, 300],
+      "credentials": {
+        "notionApi": {
+          "id": "notion-api",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": "={{ $json.body.contactsDatabaseId }}",
+        "returnAll": false,
+        "limit": "={{ $json.body.limit || 10 }}",
+        "filterType": "manual",
+        "filters": {
+          "conditions": []
+        },
+        "options": {}
+      },
+      "id": "notion-get-contacts",
+      "name": "Notion — Get Contacts",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [500, 520],
+      "credentials": {
+        "notionApi": {
+          "id": "notion-api",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "create",
+        "databaseId": "={{ $json.body.dealsDatabaseId }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Name",
+              "title": "={{ $json.body.dealName }}"
+            },
+            {
+              "key": "Value",
+              "numberValue": "={{ $json.body.value }}"
+            },
+            {
+              "key": "Stage",
+              "selectValue": "={{ $json.body.stage || 'Discovery' }}"
+            },
+            {
+              "key": "Contact",
+              "relationValue": "={{ $json.body.contactId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notion-create-deal",
+      "name": "Notion — Create Deal",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [500, 740],
+      "credentials": {
+        "notionApi": {
+          "id": "notion-api",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": "={{ $json.body.dealsDatabaseId }}",
+        "returnAll": false,
+        "limit": "={{ $json.body.limit || 10 }}",
+        "filterType": "manual",
+        "filters": {
+          "conditions": []
+        },
+        "options": {}
+      },
+      "id": "notion-get-deals",
+      "name": "Notion — Get Deals",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [500, 960],
+      "credentials": {
+        "notionApi": {
+          "id": "notion-api",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": "={{ $json.body.dealId }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Stage",
+              "selectValue": "={{ $json.body.stage }}"
+            },
+            {
+              "key": "Value",
+              "numberValue": "={{ $json.body.value }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notion-update-deal",
+      "name": "Notion — Update Deal",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [500, 1180],
+      "credentials": {
+        "notionApi": {
+          "id": "notion-api",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-create-contact",
+      "name": "Respond — Create Contact",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-get-contacts",
+      "name": "Respond — Get Contacts",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 520]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-create-deal",
+      "name": "Respond — Create Deal",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 740]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-get-deals",
+      "name": "Respond — Get Deals",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 960]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-update-deal",
+      "name": "Respond — Update Deal",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 1180]
+    }
+  ],
+  "connections": {
+    "Webhook — Create Contact": {
+      "main": [[{ "node": "Notion — Create Contact", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Get Contacts": {
+      "main": [[{ "node": "Notion — Get Contacts", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Create Deal": {
+      "main": [[{ "node": "Notion — Create Deal", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Get Deals": {
+      "main": [[{ "node": "Notion — Get Deals", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Update Deal": {
+      "main": [[{ "node": "Notion — Update Deal", "type": "main", "index": 0 }]]
+    },
+    "Notion — Create Contact": {
+      "main": [[{ "node": "Respond — Create Contact", "type": "main", "index": 0 }]]
+    },
+    "Notion — Get Contacts": {
+      "main": [[{ "node": "Respond — Get Contacts", "type": "main", "index": 0 }]]
+    },
+    "Notion — Create Deal": {
+      "main": [[{ "node": "Respond — Create Deal", "type": "main", "index": 0 }]]
+    },
+    "Notion — Get Deals": {
+      "main": [[{ "node": "Respond — Get Deals", "type": "main", "index": 0 }]]
+    },
+    "Notion — Update Deal": {
+      "main": [[{ "node": "Respond — Update Deal", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "pibot"
+    }
+  ],
+  "triggerCount": 5,
+  "updatedAt": "2026-03-29T00:00:00.000Z",
+  "versionId": "1"
+}

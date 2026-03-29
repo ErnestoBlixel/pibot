@@ -1,0 +1,235 @@
+{
+  "name": "PiBot — Holded",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "holded/get_contacts",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get-contacts",
+      "name": "Webhook — Get Contacts",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "holded-get-contacts"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "holded/get_invoices",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get-invoices",
+      "name": "Webhook — Get Invoices",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 520],
+      "webhookId": "holded-get-invoices"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "holded/get_products",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get-products",
+      "name": "Webhook — Get Products",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 740],
+      "webhookId": "holded-get-products"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "holded/create_invoice",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-create-invoice",
+      "name": "Webhook — Create Invoice",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 960],
+      "webhookId": "holded-create-invoice"
+    },
+    {
+      "parameters": {
+        "url": "https://api.holded.com/api/invoicing/v1/contacts",
+        "method": "GET",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "http-get-contacts",
+      "name": "HTTP — Get Contacts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "holded-api-key",
+          "name": "Holded API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.holded.com/api/invoicing/v1/documents/invoice",
+        "method": "GET",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "http-get-invoices",
+      "name": "HTTP — Get Invoices",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 520],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "holded-api-key",
+          "name": "Holded API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.holded.com/api/invoicing/v1/products",
+        "method": "GET",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "http-get-products",
+      "name": "HTTP — Get Products",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 740],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "holded-api-key",
+          "name": "Holded API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.holded.com/api/invoicing/v1/documents/invoice",
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "contactId", "value": "={{ $json.body.contactId }}" },
+            { "name": "items", "value": "={{ $json.body.items }}" },
+            { "name": "desc", "value": "={{ $json.body.description }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-create-invoice",
+      "name": "HTTP — Create Invoice",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 960],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "holded-api-key",
+          "name": "Holded API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-contacts",
+      "name": "Respond — Contacts",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-invoices",
+      "name": "Respond — Invoices",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 520]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-products",
+      "name": "Respond — Products",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 740]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-create-invoice",
+      "name": "Respond — Create Invoice",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 960]
+    }
+  ],
+  "connections": {
+    "Webhook — Get Contacts": {
+      "main": [[{ "node": "HTTP — Get Contacts", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Get Invoices": {
+      "main": [[{ "node": "HTTP — Get Invoices", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Get Products": {
+      "main": [[{ "node": "HTTP — Get Products", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Create Invoice": {
+      "main": [[{ "node": "HTTP — Create Invoice", "type": "main", "index": 0 }]]
+    },
+    "HTTP — Get Contacts": {
+      "main": [[{ "node": "Respond — Contacts", "type": "main", "index": 0 }]]
+    },
+    "HTTP — Get Invoices": {
+      "main": [[{ "node": "Respond — Invoices", "type": "main", "index": 0 }]]
+    },
+    "HTTP — Get Products": {
+      "main": [[{ "node": "Respond — Products", "type": "main", "index": 0 }]]
+    },
+    "HTTP — Create Invoice": {
+      "main": [[{ "node": "Respond — Create Invoice", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "pibot"
+    }
+  ],
+  "triggerCount": 4,
+  "updatedAt": "2026-03-29T00:00:00.000Z",
+  "versionId": "1"
+}

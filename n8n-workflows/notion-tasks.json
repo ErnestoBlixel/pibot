@@ -1,0 +1,206 @@
+{
+  "name": "PiBot — Notion Tasks",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notion/create_task",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-create-task",
+      "name": "Webhook — Create Task",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "notion-create-task"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notion/get_tasks",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get-tasks",
+      "name": "Webhook — Get Tasks",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 520],
+      "webhookId": "notion-get-tasks"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notion/update_task",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-update-task",
+      "name": "Webhook — Update Task",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 740],
+      "webhookId": "notion-update-task"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "create",
+        "databaseId": "={{ $json.body.databaseId }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Name",
+              "title": "={{ $json.body.title }}"
+            },
+            {
+              "key": "Status",
+              "selectValue": "={{ $json.body.status || 'Not started' }}"
+            },
+            {
+              "key": "Priority",
+              "selectValue": "={{ $json.body.priority || 'Medium' }}"
+            },
+            {
+              "key": "Due Date",
+              "dateValue": "={{ $json.body.dueDate }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notion-create-task",
+      "name": "Notion — Create Task",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [500, 300],
+      "credentials": {
+        "notionApi": {
+          "id": "notion-api",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": "={{ $json.body.databaseId }}",
+        "returnAll": false,
+        "limit": "={{ $json.body.limit || 10 }}",
+        "filterType": "manual",
+        "filters": {
+          "conditions": []
+        },
+        "options": {}
+      },
+      "id": "notion-get-tasks",
+      "name": "Notion — Get Tasks",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [500, 520],
+      "credentials": {
+        "notionApi": {
+          "id": "notion-api",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": "={{ $json.body.pageId }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status",
+              "selectValue": "={{ $json.body.status }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notion-update-task",
+      "name": "Notion — Update Task",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [500, 740],
+      "credentials": {
+        "notionApi": {
+          "id": "notion-api",
+          "name": "Notion API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-create",
+      "name": "Respond — Create",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-get",
+      "name": "Respond — Get",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 520]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-update",
+      "name": "Respond — Update",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 740]
+    }
+  ],
+  "connections": {
+    "Webhook — Create Task": {
+      "main": [[{ "node": "Notion — Create Task", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Get Tasks": {
+      "main": [[{ "node": "Notion — Get Tasks", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Update Task": {
+      "main": [[{ "node": "Notion — Update Task", "type": "main", "index": 0 }]]
+    },
+    "Notion — Create Task": {
+      "main": [[{ "node": "Respond — Create", "type": "main", "index": 0 }]]
+    },
+    "Notion — Get Tasks": {
+      "main": [[{ "node": "Respond — Get", "type": "main", "index": 0 }]]
+    },
+    "Notion — Update Task": {
+      "main": [[{ "node": "Respond — Update", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "pibot"
+    }
+  ],
+  "triggerCount": 3,
+  "updatedAt": "2026-03-29T00:00:00.000Z",
+  "versionId": "1"
+}

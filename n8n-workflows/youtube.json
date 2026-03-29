@@ -1,0 +1,176 @@
+{
+  "name": "PiBot — YouTube",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "youtube/search_videos",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-search-videos",
+      "name": "Webhook — Search Videos",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "youtube-search-videos"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "youtube/get_channel_info",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get-channel",
+      "name": "Webhook — Get Channel Info",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 520],
+      "webhookId": "youtube-get-channel-info"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "youtube/get_video_details",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get-video",
+      "name": "Webhook — Get Video Details",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 740],
+      "webhookId": "youtube-get-video-details"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": "={{ $json.body.limit || 10 }}",
+        "filters": {
+          "q": "={{ $json.body.query }}"
+        },
+        "options": {}
+      },
+      "id": "youtube-search",
+      "name": "YouTube — Search",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [500, 300],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "youtube-oauth2",
+          "name": "YouTube OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "channel",
+        "operation": "get",
+        "channelId": "={{ $json.body.channelId }}",
+        "options": {}
+      },
+      "id": "youtube-channel",
+      "name": "YouTube — Channel Info",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [500, 520],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "youtube-oauth2",
+          "name": "YouTube OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "get",
+        "videoId": "={{ $json.body.videoId }}",
+        "options": {}
+      },
+      "id": "youtube-video",
+      "name": "YouTube — Video Details",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [500, 740],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "youtube-oauth2",
+          "name": "YouTube OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-search",
+      "name": "Respond — Search",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-channel",
+      "name": "Respond — Channel",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 520]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-video",
+      "name": "Respond — Video",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 740]
+    }
+  ],
+  "connections": {
+    "Webhook — Search Videos": {
+      "main": [[{ "node": "YouTube — Search", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Get Channel Info": {
+      "main": [[{ "node": "YouTube — Channel Info", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Get Video Details": {
+      "main": [[{ "node": "YouTube — Video Details", "type": "main", "index": 0 }]]
+    },
+    "YouTube — Search": {
+      "main": [[{ "node": "Respond — Search", "type": "main", "index": 0 }]]
+    },
+    "YouTube — Channel Info": {
+      "main": [[{ "node": "Respond — Channel", "type": "main", "index": 0 }]]
+    },
+    "YouTube — Video Details": {
+      "main": [[{ "node": "Respond — Video", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "pibot"
+    }
+  ],
+  "triggerCount": 3,
+  "updatedAt": "2026-03-29T00:00:00.000Z",
+  "versionId": "1"
+}

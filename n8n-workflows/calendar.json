@@ -1,0 +1,238 @@
+{
+  "name": "PiBot — Google Calendar",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "calendar/create_event",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-create-event",
+      "name": "Webhook — Create Event",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "calendar-create-event"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "calendar/get_events",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get-events",
+      "name": "Webhook — Get Events",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 520],
+      "webhookId": "calendar-get-events"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "calendar/update_event",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-update-event",
+      "name": "Webhook — Update Event",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 740],
+      "webhookId": "calendar-update-event"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "calendar/delete_event",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-delete-event",
+      "name": "Webhook — Delete Event",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 960],
+      "webhookId": "calendar-delete-event"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "calendar": "={{ $json.body.calendarId || 'primary' }}",
+        "summary": "={{ $json.body.title }}",
+        "start": "={{ $json.body.startTime }}",
+        "end": "={{ $json.body.endTime }}",
+        "additionalFields": {
+          "description": "={{ $json.body.description }}",
+          "location": "={{ $json.body.location }}"
+        }
+      },
+      "id": "gcal-create",
+      "name": "Google Calendar — Create",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.2,
+      "position": [500, 300],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "gcal-oauth2",
+          "name": "Google Calendar OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": "={{ $json.body.calendarId || 'primary' }}",
+        "returnAll": false,
+        "limit": "={{ $json.body.limit || 10 }}",
+        "options": {
+          "timeMin": "={{ $json.body.timeMin }}",
+          "timeMax": "={{ $json.body.timeMax }}"
+        }
+      },
+      "id": "gcal-get",
+      "name": "Google Calendar — Get Events",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.2,
+      "position": [500, 520],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "gcal-oauth2",
+          "name": "Google Calendar OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": "={{ $json.body.calendarId || 'primary' }}",
+        "eventId": "={{ $json.body.eventId }}",
+        "updateFields": {
+          "summary": "={{ $json.body.title }}",
+          "start": "={{ $json.body.startTime }}",
+          "end": "={{ $json.body.endTime }}",
+          "description": "={{ $json.body.description }}",
+          "location": "={{ $json.body.location }}"
+        }
+      },
+      "id": "gcal-update",
+      "name": "Google Calendar — Update",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.2,
+      "position": [500, 740],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "gcal-oauth2",
+          "name": "Google Calendar OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": "={{ $json.body.calendarId || 'primary' }}",
+        "eventId": "={{ $json.body.eventId }}",
+        "options": {}
+      },
+      "id": "gcal-delete",
+      "name": "Google Calendar — Delete",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.2,
+      "position": [500, 960],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "gcal-oauth2",
+          "name": "Google Calendar OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-create",
+      "name": "Respond — Create",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-get",
+      "name": "Respond — Get",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 520]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-update",
+      "name": "Respond — Update",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 740]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-delete",
+      "name": "Respond — Delete",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 960]
+    }
+  ],
+  "connections": {
+    "Webhook — Create Event": {
+      "main": [[{ "node": "Google Calendar — Create", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Get Events": {
+      "main": [[{ "node": "Google Calendar — Get Events", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Update Event": {
+      "main": [[{ "node": "Google Calendar — Update", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Delete Event": {
+      "main": [[{ "node": "Google Calendar — Delete", "type": "main", "index": 0 }]]
+    },
+    "Google Calendar — Create": {
+      "main": [[{ "node": "Respond — Create", "type": "main", "index": 0 }]]
+    },
+    "Google Calendar — Get Events": {
+      "main": [[{ "node": "Respond — Get", "type": "main", "index": 0 }]]
+    },
+    "Google Calendar — Update": {
+      "main": [[{ "node": "Respond — Update", "type": "main", "index": 0 }]]
+    },
+    "Google Calendar — Delete": {
+      "main": [[{ "node": "Respond — Delete", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "pibot"
+    }
+  ],
+  "triggerCount": 4,
+  "updatedAt": "2026-03-29T00:00:00.000Z",
+  "versionId": "1"
+}

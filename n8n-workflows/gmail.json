@@ -1,0 +1,174 @@
+{
+  "name": "PiBot — Gmail",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gmail/read_email",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-read-email",
+      "name": "Webhook — Read Email",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "gmail-read-email"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gmail/send_email",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-send-email",
+      "name": "Webhook — Send Email",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 520],
+      "webhookId": "gmail-send-email"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gmail/search_emails",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-search-emails",
+      "name": "Webhook — Search Emails",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 740],
+      "webhookId": "gmail-search-emails"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.body.messageId }}",
+        "options": {}
+      },
+      "id": "gmail-read",
+      "name": "Gmail — Read",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [500, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-oauth2",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.body.to }}",
+        "subject": "={{ $json.body.subject }}",
+        "message": "={{ $json.body.body }}",
+        "options": {}
+      },
+      "id": "gmail-send",
+      "name": "Gmail — Send",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [500, 520],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-oauth2",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": "={{ $json.body.limit || 10 }}",
+        "filters": {
+          "q": "={{ $json.body.query }}"
+        },
+        "options": {}
+      },
+      "id": "gmail-search",
+      "name": "Gmail — Search",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [500, 740],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-oauth2",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-read",
+      "name": "Respond — Read",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-send",
+      "name": "Respond — Send",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 520]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-search",
+      "name": "Respond — Search",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 740]
+    }
+  ],
+  "connections": {
+    "Webhook — Read Email": {
+      "main": [[{ "node": "Gmail — Read", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Send Email": {
+      "main": [[{ "node": "Gmail — Send", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Search Emails": {
+      "main": [[{ "node": "Gmail — Search", "type": "main", "index": 0 }]]
+    },
+    "Gmail — Read": {
+      "main": [[{ "node": "Respond — Read", "type": "main", "index": 0 }]]
+    },
+    "Gmail — Send": {
+      "main": [[{ "node": "Respond — Send", "type": "main", "index": 0 }]]
+    },
+    "Gmail — Search": {
+      "main": [[{ "node": "Respond — Search", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "pibot"
+    }
+  ],
+  "triggerCount": 3,
+  "updatedAt": "2026-03-29T00:00:00.000Z",
+  "versionId": "1"
+}

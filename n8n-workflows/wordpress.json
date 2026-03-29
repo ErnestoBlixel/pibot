@@ -1,0 +1,226 @@
+{
+  "name": "PiBot — WordPress",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wordpress/create_post",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-create-post",
+      "name": "Webhook — Create Post",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "wordpress-create-post"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wordpress/get_posts",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get-posts",
+      "name": "Webhook — Get Posts",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 520],
+      "webhookId": "wordpress-get-posts"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wordpress/update_post",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-update-post",
+      "name": "Webhook — Update Post",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 740],
+      "webhookId": "wordpress-update-post"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wordpress/delete_post",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-delete-post",
+      "name": "Webhook — Delete Post",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 960],
+      "webhookId": "wordpress-delete-post"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "title": "={{ $json.body.title }}",
+        "content": "={{ $json.body.content }}",
+        "status": "={{ $json.body.status || 'draft' }}",
+        "additionalFields": {}
+      },
+      "id": "wp-create",
+      "name": "WordPress — Create",
+      "type": "n8n-nodes-base.wordpress",
+      "typeVersion": 1,
+      "position": [500, 300],
+      "credentials": {
+        "wordpressApi": {
+          "id": "wordpress-api",
+          "name": "WordPress API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": "={{ $json.body.limit || 10 }}",
+        "options": {}
+      },
+      "id": "wp-get",
+      "name": "WordPress — Get Posts",
+      "type": "n8n-nodes-base.wordpress",
+      "typeVersion": 1,
+      "position": [500, 520],
+      "credentials": {
+        "wordpressApi": {
+          "id": "wordpress-api",
+          "name": "WordPress API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "postId": "={{ $json.body.postId }}",
+        "updateFields": {
+          "title": "={{ $json.body.title }}",
+          "content": "={{ $json.body.content }}",
+          "status": "={{ $json.body.status }}"
+        }
+      },
+      "id": "wp-update",
+      "name": "WordPress — Update",
+      "type": "n8n-nodes-base.wordpress",
+      "typeVersion": 1,
+      "position": [500, 740],
+      "credentials": {
+        "wordpressApi": {
+          "id": "wordpress-api",
+          "name": "WordPress API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "postId": "={{ $json.body.postId }}",
+        "options": {}
+      },
+      "id": "wp-delete",
+      "name": "WordPress — Delete",
+      "type": "n8n-nodes-base.wordpress",
+      "typeVersion": 1,
+      "position": [500, 960],
+      "credentials": {
+        "wordpressApi": {
+          "id": "wordpress-api",
+          "name": "WordPress API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-create",
+      "name": "Respond — Create",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-get",
+      "name": "Respond — Get",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 520]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-update",
+      "name": "Respond — Update",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 740]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, data: $json }) }}",
+        "options": {}
+      },
+      "id": "respond-delete",
+      "name": "Respond — Delete",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 960]
+    }
+  ],
+  "connections": {
+    "Webhook — Create Post": {
+      "main": [[{ "node": "WordPress — Create", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Get Posts": {
+      "main": [[{ "node": "WordPress — Get Posts", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Update Post": {
+      "main": [[{ "node": "WordPress — Update", "type": "main", "index": 0 }]]
+    },
+    "Webhook — Delete Post": {
+      "main": [[{ "node": "WordPress — Delete", "type": "main", "index": 0 }]]
+    },
+    "WordPress — Create": {
+      "main": [[{ "node": "Respond — Create", "type": "main", "index": 0 }]]
+    },
+    "WordPress — Get Posts": {
+      "main": [[{ "node": "Respond — Get", "type": "main", "index": 0 }]]
+    },
+    "WordPress — Update": {
+      "main": [[{ "node": "Respond — Update", "type": "main", "index": 0 }]]
+    },
+    "WordPress — Delete": {
+      "main": [[{ "node": "Respond — Delete", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "pibot"
+    }
+  ],
+  "triggerCount": 4,
+  "updatedAt": "2026-03-29T00:00:00.000Z",
+  "versionId": "1"
+}
