@@ -20,10 +20,18 @@ def _get_pool() -> asyncpg.Pool:
     return _pool
 
 
+def _clean_dsn(dsn: str) -> str:
+    """Convierte postgresql+asyncpg:// a postgresql:// para asyncpg."""
+    if dsn.startswith("postgresql+asyncpg://"):
+        return dsn.replace("postgresql+asyncpg://", "postgresql://", 1)
+    return dsn
+
+
 async def init_pool() -> None:
     """Crea el pool de conexiones al arrancar."""
     global _pool
-    _pool = await asyncpg.create_pool(settings.DATABASE_URL, min_size=2, max_size=10)
+    dsn = _clean_dsn(settings.DATABASE_URL)
+    _pool = await asyncpg.create_pool(dsn, min_size=2, max_size=10)
     logger.info("postgres_pool_created")
 
 
