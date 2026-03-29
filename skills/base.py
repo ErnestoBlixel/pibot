@@ -1,48 +1,50 @@
 """
 Sistema de skills para PiBot.
-Registro y descubrimiento de habilidades especializadas.
+Cada skill es un experto con system prompt, triggers y acceso a memoria.
 """
+
+from dataclasses import dataclass, field
 
 import structlog
 
+from orchestrator.llm import chat_completion
+
 logger = structlog.get_logger()
 
-_SKILLS: dict[str, dict] = {}
+_SKILLS: dict[str, "Skill"] = {}
 
 
-def register_skill(name: str, description: str, handler, category: str = "general") -> None:
-    """Registra una skill en el sistema."""
-    _SKILLS[name] = {
-        "name": name,
-        "description": description,
-        "handler": handler,
-        "category": category,
-    }
-    logger.info("skill_registered", name=name, category=category)
+@dataclass
+class Skill:
+    name: str
+    description: str
+    system_prompt: str
+    triggers: list[str] = field(default_factory=list)
+
+    async def execute(self, user_message: str, context: list[dict] | None = None) -> str:
+        messages = [{"role": "system", "content": self.system_prompt}]
+        if context:
+            messages.extend(context[-4:])
+        messages.append({"role": "user", "content": user_message})
+        return await chat_completion(messages, temperature=0.3)
+
+
+def register_skill(skill: Skill) -> None:
+    _SKILLS[skill.name] = skill
 
 
 def list_skills() -> list[dict]:
-    """Devuelve la lista de skills registradas (sin el handler)."""
-    return [
-        {"name": s["name"], "description": s["description"], "category": s["category"]}
-        for s in _SKILLS.values()
-    ]
+    return [{"name": s.name, "description": s.description} for s in _SKILLS.values()]
 
 
-def get_skill(name: str):
-    """Devuelve una skill por nombre o None."""
-    entry = _SKILLS.get(name)
-    return entry["handler"] if entry else None
+def get_skill(name: str) -> Skill | None:
+    return _SKILLS.get(name)
 
 
-async def execute_skill(name: str, **kwargs) -> str:
-    """Ejecuta una skill por nombre."""
-    handler = get_skill(name)
-    if not handler:
-        return f"Skill '{name}' no encontrada."
-    try:
-        result = await handler(**kwargs)
-        return result
-    except Exception as e:
-        logger.error("skill_error", name=name, error=str(e))
-        return f"Error ejecutando skill '{name}': {e}"
+def match_skill(message: str) -> Skill | None:
+    msg_lower = message.lower()
+    for skill in _SKILLS.values():
+        for trigger in skill.triggers:
+            if trigger in msg_lower:
+                return skill
+    return None

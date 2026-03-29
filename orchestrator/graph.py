@@ -51,7 +51,22 @@ async def process_message(message: str, session_id: str, channel: str = "api") -
     # Guardar mensaje del usuario
     await save_message(session_id, "user", message, channel=channel)
 
-    # Enrutar
+    # 1. Intentar matchear un skill experto PRIMERO
+    try:
+        from skills.base import match_skill
+        skill = match_skill(message)
+        if skill:
+            logger.info("skill_matched", skill=skill.name)
+            context = await get_context_messages(session_id, limit=4)
+            context_msgs = [{"role": r["role"], "content": r["content"]} for r in context]
+            response_text = await skill.execute(message, context=context_msgs)
+            await save_message(session_id, "assistant", response_text, channel=channel)
+            await log_audit(f"skill:{skill.name}", "execute", status="ok", session_id=session_id)
+            return {"text": response_text, "agent_used": f"skill:{skill.name}", "voice_url": None}
+    except Exception as e:
+        logger.warning("skill_match_error", error=str(e))
+
+    # 2. Enrutar a agente n8n
     route = await route_message(message, session_id=session_id)
     agent_name = route["agent"]
     confidence = route.get("confidence", 0)

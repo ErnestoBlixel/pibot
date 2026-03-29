@@ -17,7 +17,7 @@ KEYWORD_MAP = {
     "calendar": ["calendario", "evento", "reunión", "cita", "agenda", "meeting"],
     "youtube": ["youtube", "video", "vídeo", "canal", "suscriptores", "métricas youtube"],
     "wordpress": ["blog", "wordpress", "artículo", "post", "publicar", "wp"],
-    "holded": ["factura", "holded", "presupuesto", "contacto holded", "producto holded"],
+    "holded": ["factura", "holded", "contacto holded", "producto holded"],
     "notion_tasks": ["tarea", "task", "pendiente", "to-do", "todo", "notion tarea"],
     "notion_crm": ["crm", "lead", "prospecto", "cliente potencial", "pipeline"],
 }

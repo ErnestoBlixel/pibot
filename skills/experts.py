@@ -1,53 +1,69 @@
 """
-Skills de expertos para PiBot.
-Skills predefinidas que encapsulan conocimiento especializado.
+Skills expertos de PiBot — 6 especialistas con system prompts dedicados.
 """
 
-from orchestrator.llm import chat_completion
-from skills.base import register_skill
+from skills.base import Skill, register_skill
 
+register_skill(Skill(
+    name="project_analyst",
+    description="Analiza proyectos, detecta riesgos, sugiere mejoras y genera reports de estado.",
+    triggers=["analiza el proyecto", "estado del proyecto", "riesgos del proyecto", "análisis de proyecto"],
+    system_prompt="""Eres el Analista de Proyectos de Blixel AI. Experto en gestión de proyectos de automatización e IA.
+Analiza estado, detecta riesgos, propone mejoras. Sé específico con nombres, fechas, números.
+Clientes activos: Angel Mir/Portes Bisbal, Michel Paschoud, Adeneo Energía, CISLE/Joaquín Novales.
+Idioma: español.""",
+))
 
-async def summarize_text(text: str, **kwargs) -> str:
-    """Resume un texto largo en puntos clave."""
-    messages = [
-        {"role": "system", "content": "Resume el siguiente texto en puntos clave concisos en español."},
-        {"role": "user", "content": text},
-    ]
-    return await chat_completion(messages, temperature=0.3)
+register_skill(Skill(
+    name="n8n_expert",
+    description="Diseña workflows de n8n, resuelve problemas de automatización.",
+    triggers=["workflow", "n8n", "automatización", "automatizar", "flujo de trabajo"],
+    system_prompt="""Eres el Experto en n8n de Blixel AI. Dominas n8n a nivel avanzado.
+Diseña workflows completos, resuelve errores, optimiza flujos.
+Stack: n8n self-hosted en EasyPanel, PostgreSQL, Redis, OpenRouter.
+Cuando diseñes un workflow: describe trigger, nodos, conexiones, manejo de errores.
+Idioma: español.""",
+))
 
+register_skill(Skill(
+    name="email_marketing",
+    description="Diseña campañas de email, crea copies, analiza métricas.",
+    triggers=["email marketing", "campaña de email", "newsletter", "mailing", "campaña"],
+    system_prompt="""Eres el Experto en Email Marketing de Blixel AI.
+Diseña campañas, crea copies efectivos, sugiere segmentación y horarios.
+Público: empresas industriales y de servicios en Girona/Catalunya.
+Cuando crees un email: asunto + preheader + estructura + CTA + variante A/B.
+Idioma: español.""",
+))
 
-async def translate_text(text: str, target_lang: str = "en", **kwargs) -> str:
-    """Traduce texto al idioma indicado."""
-    messages = [
-        {"role": "system", "content": f"Traduce el siguiente texto a {target_lang}. Solo devuelve la traducción."},
-        {"role": "user", "content": text},
-    ]
-    return await chat_completion(messages, temperature=0.2)
+register_skill(Skill(
+    name="budget_expert",
+    description="Genera presupuestos, calcula costes de proyectos, analiza rentabilidad.",
+    triggers=["presupuesto", "cotización", "precio", "coste del proyecto", "propuesta económica"],
+    system_prompt="""Eres el Experto en Presupuestos de Blixel AI.
+Tarifas: consultoría 95€/h, desarrollo 75€/h, workflow n8n simple 300-500€, complejo 800-2000€,
+integración API 1500-5000€, chatbot IA 3000-8000€, mantenimiento 200-600€/mes.
+Siempre incluye: desglose por fase, horas × tarifa, total con/sin IVA (21%).
+Idioma: español.""",
+))
 
+register_skill(Skill(
+    name="ai_expert",
+    description="Asesora sobre modelos de IA, arquitecturas, fine-tuning, RAG.",
+    triggers=["modelo de ia", "inteligencia artificial", "llm", "fine-tuning", "rag", "embeddings", "qué modelo"],
+    system_prompt="""Eres el Experto en IA de Blixel AI.
+Recomienda modelos según caso de uso, diseña arquitecturas RAG/agentes, compara proveedores.
+Stack: Claude Sonnet via OpenRouter, Ollama en Azure VM, pgvector, LangGraph.
+Cuando recomiendes: caso de uso, modelo, coste, pros/contras, complejidad.
+Idioma: español.""",
+))
 
-async def draft_email(context: str, tone: str = "profesional", **kwargs) -> str:
-    """Redacta un borrador de correo electrónico."""
-    messages = [
-        {"role": "system", "content": (
-            f"Redacta un correo electrónico con tono {tone} basado en el contexto proporcionado. "
-            "Incluye asunto, saludo, cuerpo y despedida."
-        )},
-        {"role": "user", "content": context},
-    ]
-    return await chat_completion(messages, temperature=0.4)
-
-
-async def analyze_data(data: str, question: str = "", **kwargs) -> str:
-    """Analiza datos y responde preguntas sobre ellos."""
-    messages = [
-        {"role": "system", "content": "Analiza los datos proporcionados y responde de forma clara y concisa."},
-        {"role": "user", "content": f"Datos:\n{data}\n\nPregunta: {question}" if question else f"Analiza estos datos:\n{data}"},
-    ]
-    return await chat_completion(messages, temperature=0.3)
-
-
-# Registrar skills al importar el módulo
-register_skill("summarize", "Resume textos largos en puntos clave", summarize_text, category="text")
-register_skill("translate", "Traduce texto entre idiomas", translate_text, category="text")
-register_skill("draft_email", "Redacta borradores de correo electrónico", draft_email, category="communication")
-register_skill("analyze_data", "Analiza datos y responde preguntas", analyze_data, category="analytics")
+register_skill(Skill(
+    name="sysadmin_expert",
+    description="Gestiona infraestructura, Docker, servidores, seguridad.",
+    triggers=["servidor", "docker", "infraestructura", "easypanel", "deploy", "sistema"],
+    system_prompt="""Eres el Experto en Sistemas de Blixel AI.
+Infra: KVM2 Hostinger 8GB RAM, EasyPanel, n8n, PostgreSQL, Redis, Azure VM con Ollama.
+Diagnostica problemas, optimiza rendimiento, configura backups y seguridad.
+Idioma: español.""",
+))
