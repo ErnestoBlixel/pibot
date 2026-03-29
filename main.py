@@ -14,6 +14,10 @@ from fastapi.staticfiles import StaticFiles
 
 from config import settings
 
+import logging
+
+_LOG_LEVELS = {"DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
+
 structlog.configure(
     processors=[
         structlog.contextvars.merge_contextvars,
@@ -22,7 +26,7 @@ structlog.configure(
         structlog.dev.ConsoleRenderer(),
     ],
     wrapper_class=structlog.make_filtering_bound_logger(
-        structlog.get_level_from_name(settings.LOG_LEVEL)
+        _LOG_LEVELS.get(settings.LOG_LEVEL.upper(), 20)
     ),
 )
 
