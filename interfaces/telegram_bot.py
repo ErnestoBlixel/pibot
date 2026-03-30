@@ -46,7 +46,10 @@ async def start_bot() -> None:
         logger.info("telegram_message", chat_id=chat_id, text=text[:80])
 
         result = await process_message(message=text, session_id=session_id, channel="telegram")
-        await update.message.reply_text(result["text"], parse_mode="Markdown")
+        try:
+            await update.message.reply_text(result["text"], parse_mode="Markdown")
+        except Exception:
+            await update.message.reply_text(result["text"])
 
     async def handle_voice(update: Update, context) -> None:
         chat_id = str(update.effective_chat.id)
