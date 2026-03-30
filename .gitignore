@@ -7,3 +7,5 @@ dist/
 htmlcov/
 .venv/
 venv/
+# Scripts temporales de carga/mantenimiento (pueden contener credenciales)
+tmp_*.py
