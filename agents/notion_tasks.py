@@ -4,4 +4,4 @@ from agents.base import BaseAgent
 class NotionTasksAgent(BaseAgent):
     name = "notion_tasks"
     description = "Gestión de tareas en Notion"
-    webhook_path = "notion-tasks"
+    webhook_path = "notion-crm"
