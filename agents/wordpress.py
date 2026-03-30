@@ -1,9 +1,7 @@
-"""Agente de wordpress — llama al AI Agent de n8n."""
-
+"""Agente de WordPress — llama al AI Agent de n8n."""
 from agents.base import BaseAgent
 
-
-class WordpressAgent(BaseAgent):
+class WordPressAgent(BaseAgent):
     name = "wordpress"
-    description = "Agente wordpress"
+    description = "Gestión de WordPress"
     webhook_path = "wordpress"

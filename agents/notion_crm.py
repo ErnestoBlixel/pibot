@@ -1,9 +1,7 @@
-"""Agente de notion_crm — llama al AI Agent de n8n."""
-
+"""Agente de Notion CRM — llama al AI Agent de n8n."""
 from agents.base import BaseAgent
 
-
-class Notion_crmAgent(BaseAgent):
+class NotionCRMAgent(BaseAgent):
     name = "notion_crm"
-    description = "Agente notion_crm"
+    description = "Gestión de CRM en Notion"
     webhook_path = "notion-crm"
